@@ -1,0 +1,175 @@
+<!-- navbar -->
+  {{> _docNav}}
+<!-- end of navbar -->
+<style>
+  .calendar_body {
+    margin: 0px 0px;
+    margin-top: 15px;
+    padding: 0;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+    font-size: 14px;
+  }
+
+  #calendar {
+    max-width: 1100px;
+    margin:2%;
+  }
+
+  @media (max-width:500px){
+  }
+</style>
+
+    <!-- cards -->
+    <section>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-xl-10 col-lg-9 col-md-8 ml-auto">
+            <div class="row pt-md-5 mt-md-3 mb-5">
+              <div class="col-xl-4 col-sm-6 p-2">
+                <div class="card card-common">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                      <i class="fas fa-user fa-3x text-danger"></i>
+                      <div class="text-right text-secondary">
+                        <h5>Requested Appointments</h5>
+                        <h3>4</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer text-secondary">
+                    <i class="far fa-eye mr-3"></i>
+                    <span>View Now</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-4 col-sm-6 p-2">
+                <div class="card card-common">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                      <i class="fas fa-user fa-3x text-primary"></i>
+                      <div class="text-right text-secondary">
+                        <h5>Approved Appointments</h5>
+                        <h3>2</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer text-secondary">
+                    <i class="far fa-eye mr-3"></i>
+                    <span>View Now</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-4 col-sm-6 p-2">
+                <div class="card card-common">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                      <i class="fas fa-users fa-3x text-info"></i>
+                      <div class="text-right text-secondary">
+                        <h5>Total Patient Treated</h5>
+                        <h3>5</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer text-secondary">
+                    <i class="far fa-eye mr-3"></i>
+                    <span>View Now</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- end of cards -->
+
+    <!-- tables -->
+    <section>
+      <div class="container-fluid">
+        <div class="row mb-5">
+          <div class="col-xl-10 col-lg-9 col-md-8 ml-auto">
+            <div class="row justify-content-center ">
+              {{#if apts}}
+              <div class="col-xl-12 col-12 mb-4 mb-xl-0">
+                <h3 class="text-muted text-center mb-3">New Appointment Requests</h3>
+                <table class="table table-striped bg-light text-center">
+                  <thead>
+                    <tr class="text-muted">
+                      <div class="col-6">
+                      <th>Patient Name</th>
+                      <th>Email</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                      </div>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each apts}}
+                    <tr>
+                      <td>{{patientId.userName}}</td>
+                      <td>{{patientId.email}}</td>
+                      <td>{{formatDate appointmentDate 'L'}}</td>
+                      <td>{{formatDate appointmentDate 'LT'}}-{{formatDate appointmentEnd 'LT'}}</td>
+                      <td>
+                        <a href="{{docId.userName}}/viewPatient/{{_id}}">
+                          <button type="button" class="btn btn-primary"><i class="fas fa-eye"></i></button></a>
+                          <a href="{{docId.userName}}/rejectPatient/{{_id}}">
+                          <button type="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button></a>
+                          <a href="{{docId.userName}}/acceptPatient/{{_id}}">
+                          <button type="button" class="btn btn-success"><i class="fas fa-check"></i></button></a>
+                      </td>
+                    </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+              {{/if}}
+              <div class="col-xl-10 col-12 calendar_body align-item-center">
+                <div value='litera' id='calendar'></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- end of tables -->
+
+    <script>
+    var startTime, endTime, eventTitle;
+    var timeObj = new Array();
+    "{{#each aptCal}}"
+    startTime = "{{formatDate appointmentDate ''}}".split("+");
+    startTime = startTime[0];
+    endTime = "{{formatDate appointmentEnd ''}}".split("+");
+    endTime = endTime[0];
+    eventTitle = 'Appointmet with '+ "{{patientId.name}}";
+
+    timeObj.push({end:endTime,
+    start:startTime,
+    title:eventTitle});
+    "{{/each}}"
+      document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+          },
+          initialDate: '2020-12-30',
+          navLinks: true, // can click day/week names to navigate views
+          nowIndicator: true,
+
+          weekNumbers: true,
+          weekNumberCalculation: 'ISO',
+
+          editable: true,
+          selectable: true,
+          dayMaxEvents: true, // allow "more" link when too many events
+          events: timeObj
+        });
+        calendar.render();
+      });
+    </script>
